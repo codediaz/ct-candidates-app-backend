@@ -1,0 +1,148 @@
+openapi: 3.0.3
+info:
+  title: Ticket Reservation System API
+  description: API RESTful para gestionar eventos y reservas de tickets.
+  version: 1.0.0
+  contact:
+    name: Sergio Díaz
+    email: sergio.diaz@funiber.org
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor local para pruebas
+
+paths:
+  /events:
+    get:
+      summary: Listar todos los eventos disponibles
+      responses:
+        '200':
+          description: Lista de eventos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+    post:
+      summary: Agregar un nuevo evento (solo para administradores)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+      responses:
+        '201':
+          description: Evento creado con éxito
+        '403':
+          description: Acceso denegado (solo administradores)
+
+  /events/{id}:
+    get:
+      summary: Obtener detalles de un evento específico
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID del evento
+      responses:
+        '200':
+          description: Detalles del evento
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '404':
+          description: Evento no encontrado
+    put:
+      summary: Editar un evento existente
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID del evento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+      responses:
+        '200':
+          description: Evento actualizado con éxito
+        '404':
+          description: Evento no encontrado
+    delete:
+      summary: Eliminar un evento (solo para administradores)
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: ID del evento
+      responses:
+        '204':
+          description: Evento eliminado con éxito
+        '404':
+          description: Evento no encontrado
+        '403':
+          description: Acceso denegado (solo administradores)
+
+  /reservations:
+    post:
+      summary: Crear una nueva reserva de tickets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reservation'
+      responses:
+        '201':
+          description: Reserva creada con éxito
+        '400':
+          description: Error en la solicitud
+
+components:
+  schemas:
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID único del evento
+        name:
+          type: string
+          description: Nombre del evento
+        date:
+          type: string
+          format: date
+          description: Fecha del evento
+        location:
+          type: string
+          description: Ubicación del evento
+        availableTickets:
+          type: integer
+          description: Número de tickets disponibles
+
+    Reservation:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID único de la reserva
+        eventId:
+          type: string
+          description: ID del evento para el cual se realiza la reserva
+        quantity:
+          type: integer
+          description: Cantidad de tickets reservados
+        userId:
+          type: string
+          description: ID del usuario que realiza la reserva
