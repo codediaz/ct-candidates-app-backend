@@ -1,0 +1,166 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "version": "1.0.0",
+      "title": "Ticket Reservation API",
+      "description": "API para gestionar eventos, reservas y usuarios"
+    },
+    "host": "localhost:5000",
+    "basePath": "/",
+    "schemes": ["http"],
+    "paths": {
+      "/auth/register": {
+        "post": {
+          "summary": "Registrar usuario",
+          "description": "Registra un nuevo usuario en el sistema",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Datos del usuario a registrar",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": ["user", "admin"]
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Usuario registrado con éxito"
+            },
+            "400": {
+              "description": "Error en los datos enviados"
+            }
+          }
+        }
+      },
+      "/auth/login": {
+        "post": {
+          "summary": "Iniciar sesión",
+          "description": "Autentica a un usuario y devuelve un token JWT",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Datos de autenticación",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Inicio de sesión exitoso con un token JWT"
+            },
+            "401": {
+              "description": "Usuario o contraseña incorrectos"
+            }
+          }
+        }
+      },
+      "/events": {
+        "get": {
+          "summary": "Listar eventos",
+          "description": "Obtiene una lista de todos los eventos disponibles",
+          "responses": {
+            "200": {
+              "description": "Lista de eventos",
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer" },
+                    "name": { "type": "string" },
+                    "date": { "type": "string", "format": "date" },
+                    "location": { "type": "string" },
+                    "tickets": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "summary": "Crear un evento",
+          "description": "Crea un nuevo evento (requiere permisos de administrador)",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Datos del evento a crear",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "date": { "type": "string", "format": "date" },
+                  "location": { "type": "string" },
+                  "tickets": { "type": "integer" }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Evento creado con éxito"
+            },
+            "403": {
+              "description": "Acceso denegado (solo administradores)"
+            }
+          }
+        }
+      },
+      "/reservations": {
+        "post": {
+          "summary": "Crear una reserva",
+          "description": "Crea una reserva para un evento",
+          "parameters": [
+            {
+              "in": "body",
+              "name": "body",
+              "description": "Datos de la reserva",
+              "required": true,
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "eventId": { "type": "integer" },
+                  "userId": { "type": "integer" },
+                  "quantity": { "type": "integer" }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "201": {
+              "description": "Reserva creada con éxito"
+            },
+            "400": {
+              "description": "Error: no hay suficientes tickets disponibles"
+            }
+          }
+        }
+      }
+    }
+  }
