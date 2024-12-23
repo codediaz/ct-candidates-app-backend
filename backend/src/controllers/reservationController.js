@@ -43,7 +43,7 @@ exports.makeReservation = async (req, res) => {
       );
 
       await connection.commit();
-      res.status(201).json({ message: 'Reservación realizada exitosamente.' });
+      res.status(201).json({ message: 'Reservacion realizada exitosamente.' });
     } catch (err) {
       await connection.rollback();
       throw err;
@@ -60,7 +60,14 @@ exports.getUserReservations = async (req, res) => {
 
   try {
     const [reservations] = await db.execute(
-      `SELECT r.id, e.name AS event_name, r.tickets, r.reservation_date
+      `SELECT 
+         r.id, 
+         e.name AS event_name, 
+         e.date AS event_date,
+         e.location AS event_location,
+         r.tickets, 
+         r.reservation_date,
+         e.location
        FROM reservations r
        JOIN events e ON r.event_id = e.id
        WHERE r.user_id = ?`,

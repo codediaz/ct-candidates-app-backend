@@ -45,7 +45,7 @@ VALUES
     '2023-12-15 20:00:00',
     'Auditorio Nacional',
     500,
-    500
+    498
   ),
   (
     'Feria del Libro',
@@ -53,7 +53,7 @@ VALUES
     '2023-11-20 10:00:00',
     'Centro de Convenciones',
     1000,
-    1000
+    995
   ),
   (
     'Exposicion de Arte',

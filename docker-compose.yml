@@ -14,8 +14,8 @@ services:
     ports:
       - ${DB_PORT}:${DB_PORT}
     networks:
-      - app-network
-      
+      - backend-network
+
   backend:
     build: ./backend
     container_name: backend
@@ -27,30 +27,11 @@ services:
     ports:
       - ${BACK_PORT}:${BACK_PORT}
     networks:
-      - app-network
-
-  frontend:
-    build: 
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: frontend
-    restart: always
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/usr/src/app
-      - /usr/src/app/node_modules
-    depends_on:
-      - backend
-    networks:
-      - app-network
-    environment:
-      NODE_ENV: development
-      WATCHPACK_POLLING: true
+      - backend-network
 
 volumes:
   db_data:
 
 networks:
-  app-network:
+  backend-network:
     driver: bridge

@@ -49,36 +49,46 @@ exports.addEvent = async (req, res) => {
 
 // Actualizar un evento (admin)
 exports.updateEvent = async (req, res) => {
-    const { id } = req.params;
-    const { name, description, date, location, total_tickets } = req.body;
-  
-    // Validar los campos requeridos
-    if (!name || !date || !location || !total_tickets) {
-      return res.status(400).json({ message: 'Faltan campos obligatorio' });
-    }
-  
-    try {
+  const { id } = req.params;
+  const { name, description, date, location, total_tickets } = req.body;
+
+  // Validar los campos requeridos
+  if (!name || !date || !location || total_tickets === undefined) {
+      return res.status(400).json({ message: 'Faltan campos obligatorios.' });
+  }
+
+  try {
       // Verificar si el evento existe
       const [event] = await db.execute('SELECT * FROM events WHERE id = ?', [id]);
-  
+
       if (event.length === 0) {
-        return res.status(404).json({ message: 'Evento no encontrado.' });
+          return res.status(404).json({ message: 'Evento no encontrado.' });
       }
-  
+
+      const reservedTickets = event[0].total_tickets - event[0].available_tickets;
+
+      // Validar que el total de boletos no sea menor a los boletos reservados
+      if (total_tickets < reservedTickets) {
+          return res.status(400).json({
+              message: 'El total de boletos no puede ser menor que el número de boletos ya reservados.'
+          });
+      }
+
       // Calcular la diferencia en tickets totales para actualizar los disponibles
       const ticketDifference = total_tickets - event[0].total_tickets;
-  
+
       // Actualizar el evento
       await db.execute(
-        'UPDATE events SET name = ?, description = ?, date = ?, location = ?, total_tickets = ?, available_tickets = available_tickets + ? WHERE id = ?',
-        [name, description, date, location, total_tickets, ticketDifference, id]
+          'UPDATE events SET name = ?, description = ?, date = ?, location = ?, total_tickets = ?, available_tickets = available_tickets + ? WHERE id = ?',
+          [name, description, date, location, total_tickets, ticketDifference, id]
       );
-  
+
       res.json({ message: 'Evento actualizado exitosamente' });
-    } catch (error) {
+  } catch (error) {
       res.status(500).json({ message: 'Error al actualizar el evento.', error });
-    }
-  };
+  }
+};
+
   
 
 // Eliminar un evento (admin)
